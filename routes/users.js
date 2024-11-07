@@ -11,4 +11,7 @@ router.get('/search', User.getUserBySearch);
 
 router.post('/', hashPassword, User.createUserAndLogin);
 
+router.patch('/:id', User.updateUser)
+
+router.delete('/:id', User.deleteUser)
 export default router

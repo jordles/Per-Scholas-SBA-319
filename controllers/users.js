@@ -39,7 +39,6 @@ const userController = {
   
   getUserBySearch: async (req, res) => {
     const queries = ["_id", "userId", "display", "email"];
-    console.log(queries)
     try{
       for(const queryKey of queries){
         if(req.query[queryKey]){
@@ -97,8 +96,29 @@ const userController = {
   },
   updateUser: async (req, res) => {
     try{
-      const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {new: true}); //new options allows us to see the updated user result.
+      const user = await User.findById(req.params.id);
+      if(!user) return res.status(400).json({ error: "No user with that _id" });
+
+      for(const key in req.body){
+        if(key == '_id' || key == 'userId') return res.status(400).json({ error: `Cannot change ${key}` });
+        if(key == 'email') await Login.findOneAndUpdate({user: user._id}, {email: req.body.email}, {new: true});
+      
+        user[key] = typeof req.body[key] === 'object' && !Array.isArray(req.body[key]) ? {...user[key], ...req.body[key]} : req.body[key];
+      }
+
+      const updatedUser = await user.save();
       res.status(200).json(updatedUser);
+    }
+    catch(err){
+      res.send(err).status(400);
+    }
+  },
+  deleteUser: async (req, res) => {
+    try{
+      if(!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ error: "No user with that _id" });
+      const deletedUser = await User.findByIdAndDelete(req.params.id);
+      const deletedLogin = await Login.findOneAndDelete({user: deletedUser._id});
+      res.status(200).json({deletedUser, deletedLogin});
     }
     catch(err){
       res.send(err).status(400);

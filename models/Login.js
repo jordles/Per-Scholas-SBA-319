@@ -1,6 +1,7 @@
 import {Schema, model} from 'mongoose';
 
 const loginSchema = new Schema({
+  loginId: { type: Number, required: true, unique: true },
   username: { type: String, required: true },
   password: { type: String, required: true },
   salt: { type: String, required: true, unique: true },

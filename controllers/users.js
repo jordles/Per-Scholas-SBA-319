@@ -1,5 +1,6 @@
+import mongoose from 'mongoose'
 import User from '../models/User.js'
-
+import Login from '../models/Login.js'
 const userController = { 
   getUsers: async (req, res) => {
     try{
@@ -13,8 +14,9 @@ const userController = {
       res.send(err.message).status(400);
     }
   },
-  getUserById: async (req, res) => {
+  getUserById: async (req, res, next) => {
     try{
+      if(isNaN(req.params.id)) return next()
       const user = await User.findById(req.params.id);
       if(!user) return res.status(400).json({error: "No user with that _id"})
       res.status(200).json(user);
@@ -34,10 +36,73 @@ const userController = {
       res.send(err.message).status(400);
     }
   },
-  getUserBySearch: (req, res) => {
-    
-    console.log(req.query._id);
-    return;
+  
+  getUserBySearch: async (req, res) => {
+    const queries = ["_id", "userId", "display", "email"];
+    console.log(queries)
+    try{
+      for(const queryKey of queries){
+        if(req.query[queryKey]){
+          let user = queryKey == "_id" 
+            ? await User.findById(mongoose.Types.ObjectId.createFromHexString(req.query[queryKey])) 
+            : queryKey == "display" 
+            ? await User.find({"name.display": req.query[queryKey]}) : await User.find({[queryKey]: req.query[queryKey]});
+          if(user.length === 1) user = user[0];
+          if(!user || user.length === 0) return res.status(400).json({error: "No user with that " + queryKey});
+          return res.status(200).json(user);
+        }
+      }
+    }
+    catch(err){
+      return res.json(err.message).status(400);
+    }
+    res.send("You can search Users by _id, userId, display, or email").status(400);
+  },
+  createUserAndLogin: async (req, res) => {
+    try{
+      const {name, email, username, password, salt, sha256} = req.body;
+      // Get the length of the collection and increment by 1
+      const userCount = await User.countDocuments();
+      const loginCount = await Login.countDocuments();
+
+      // Create and save the new User
+      const newUser = await User.create({
+        userId: userCount + 1,
+        name: {
+          first: name.first,
+          last: name.last,
+          display: name.display
+        },
+        email,
+        posts: []
+      });
+
+      // Create and save the new Login, passing newUser._id to the user field
+      const newLogin = await Login.create({
+        loginId: loginCount + 1,
+        username,
+        password,
+        salt,
+        sha256,
+        email,
+        user: newUser._id // Reference the newly created User's ObjectId
+      });
+
+      return res.status(200).json({newUser: newUser, newLogin: newLogin});
+
+    }
+    catch(err){
+      res.status(400).send({ message: "Error creating user and login", error: err.message });
+    }
+  },
+  updateUser: async (req, res) => {
+    try{
+      const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {new: true}); //new options allows us to see the updated user result.
+      res.status(200).json(updatedUser);
+    }
+    catch(err){
+      res.send(err).status(400);
+    }
   }
 }
 

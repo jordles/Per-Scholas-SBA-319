@@ -1,7 +1,7 @@
 import {Schema, model} from 'mongoose';
 
 let UserSchema = new Schema({
-  userId: { type: Number, required: true, unique: true, message: "must be an integer" },
+  userId: { type: Number, required: true, unique: true},
   name: {
     first: { type: String, required: true },
     last: { type: String },

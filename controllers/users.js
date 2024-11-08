@@ -100,17 +100,20 @@ const userController = {
       if(!user) return res.status(400).json({ error: "No user with that _id" });
 
       for(const key in req.body){
+        if(!(key in user.schema.paths)) return res.status(400).json({ error: `This key does not exist according to the schema: ${key}` });
         if(key == '_id' || key == 'userId') return res.status(400).json({ error: `Cannot change ${key}` });
         if(key == 'email') await Login.findOneAndUpdate({user: user._id}, {email: req.body.email}, {new: true});
       
-        user[key] = typeof req.body[key] === 'object' && !Array.isArray(req.body[key]) ? {...user[key], ...req.body[key]} : req.body[key];
+        user.set(key, typeof req.body[key] === 'object' && !Array.isArray(req.body[key])
+          ? { ...user[key], ...req.body[key] }
+          : req.body[key]);
       }
 
       const updatedUser = await user.save();
       res.status(200).json(updatedUser);
     }
     catch(err){
-      res.send(err).status(400);
+      res.send(err.message).status(400);
     }
   },
   deleteUser: async (req, res) => {

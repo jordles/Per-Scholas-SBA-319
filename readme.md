@@ -38,8 +38,16 @@ The Mongoose Schemas utilize reference fields between collections to create rela
 }
 </pre>
 
+### Validation (to meet the rubric requirement)
 
-### Overview Directory
+Here are a couple images of mongoose validating requests that were not valid. 
+
+![](https://raw.githubusercontent.com/jordles/Per-Scholas-SBA-319/refs/heads/main/images/schemaValidationPosts.png)
+![](https://raw.githubusercontent.com/jordles/Per-Scholas-SBA-319/refs/heads/main/images/schemaValidator.png)
+![](https://raw.githubusercontent.com/jordles/Per-Scholas-SBA-319/refs/heads/main/images/schemaValidator2.png)
+![](https://raw.githubusercontent.com/jordles/Per-Scholas-SBA-319/refs/heads/main/images/schemaValidator3.png)
+
+## Overview Directory
     .
     ├── controllers             # Controllers (functions for my routers)
     │   ├── logins
@@ -137,6 +145,10 @@ The Mongoose Schemas utilize reference fields between collections to create rela
 
 I wasn't sure how to make mockaroo incorporate relational database. I saved a list of ObjectIds' and hard coded them into a custom list to have the same objectId when i generate the rest of the data from mockaroo. 
 
+![](https://raw.githubusercontent.com/jordles/Per-Scholas-SBA-319/refs/heads/main/images/mockaroo_login.png)
+
+![](https://raw.githubusercontent.com/jordles/Per-Scholas-SBA-319/refs/heads/main/images/mockaroo_posts.png)
+
 I also pass the same objectid from posts collection back into my users collection, I utilized some commands on the mongodb shell to create a posts array and push the relevant posts' ObjectIds. So any future posts that have a corresponding user ObjectId, it will push its own ObjectId to users to keep it relational. 
 
 <pre>
@@ -156,11 +168,12 @@ db.posts.find().forEach(function(post) {
 });
 </pre>
 
-I was able to get the relational database to work, and I utilized populate(). 
+I was able to get the relational database to work, and I utilized populate() here:  
 
+![](https://raw.githubusercontent.com/jordles/Per-Scholas-SBA-319/refs/heads/main/images/relationalDataResults.png)
 
 ## Attributions
 
-[Mockaroo](https://www.mockaroo.com/)
-[One To Many Relations](https://medium.com/@brandon.lau86/one-to-many-relationships-with-mongodb-and-mongoose-in-node-express-d5c9d23d93c2)
-[Creating Relationships with Mongoose](https://medium.com/@jaydip.vala/how-to-create-relationships-with-mongoose-4307bd4ea9a5#:~:text=Mongoose%20Relationships,the%20user%20who%20created%20it.&text=Next%2C%20a%20virtual%20property%20needs%20to%20be%20added%20onto%20the%20user.)
+[Mockaroo](https://www.mockaroo.com/)  
+[One To Many Relations](https://medium.com/@brandon.lau86/one-to-many-relationships-with-mongodb-and-mongoose-in-node-express-d5c9d23d93c2)  
+[Creating Relationships with Mongoose](https://medium.com/@jaydip.vala/how-to-create-relationships-with-mongoose-4307bd4ea9a5#:~:text=Mongoose%20Relationships,the%20user%20who%20created%20it.&text=Next%2C%20a%20virtual%20property%20needs%20to%20be%20added%20onto%20the%20user.)  

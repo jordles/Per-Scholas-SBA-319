@@ -8,4 +8,9 @@ const postSchema = new Schema({
   timestamp: {type: String}
 }, { versionKey: false }) //disables the __v field
 
+//indexes
+postSchema.index({title: 1})
+postSchema.index({content: 1})
+postSchema.index({postId: 1})
+
 export default model('Post', postSchema)

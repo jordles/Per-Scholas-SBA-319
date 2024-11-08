@@ -10,5 +10,9 @@ const loginSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User', immutable: true }
 }, { versionKey: false }); //disables the __v field
 
-// loginSchema.index({email: 1}, {unique: true})
+loginSchema.index({username: 1})
+loginSchema.index({password: 1})
+loginSchema.index({user: 1})
+loginSchema.index({email: 1})
+
 export default model('Login', loginSchema)

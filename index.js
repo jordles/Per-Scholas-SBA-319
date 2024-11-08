@@ -55,10 +55,10 @@ async function initializeDatabase() {
     await Post.deleteMany({});
     await Login.deleteMany({});
 
-    // Create indexes for the collections (through mongoose Schema)
-    await User.createIndexes();
-    await Post.createIndexes();
-    await Login.createIndexes();
+    // Create indexes for the collections (through mongoose Schema); commented out because i have the indexes defined in my model Schemas. 
+    // await User.createIndexes();
+    // await Post.createIndexes();
+    // await Login.createIndexes();
 
     // Load and transform user data
     const userData = JSON.parse(fs.readFileSync('./testData/rootApp.users.json', 'utf8'));

@@ -10,7 +10,7 @@ const loginController = {
       res.status(200).json(logins);
     }
     catch(err){
-      console.log(err);
+      res.status(400).send(err);
     }
   },
   getLoginById: async (req, res) => {
@@ -20,7 +20,7 @@ const loginController = {
       res.json(login);
     }
     catch(err){
-      console.log(err);
+      res.status(400).send(err);
     }
   },
   getLoginByLoginId: async (req, res) => {
@@ -30,7 +30,17 @@ const loginController = {
       res.json(login);
     }
     catch(err){
-      console.log(err);
+      res.status(400).send(err);
+    }
+  },
+  getUserByLogin: async (req, res) => {
+    try{
+      const login = await Login.findById(req.params.id).populate('user');
+      if(!login) return res.status(400).json({error: "No login with that _id"})
+      res.json(login);
+    }
+    catch(err){
+      res.status(400).send(err);
     }
   },
   updateLogin: async (req, res) => {

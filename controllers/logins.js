@@ -50,6 +50,17 @@ const loginController = {
     catch(err){
       res.json(err.message).status(400);
     }
+  },
+  deleteLogin: async (req, res) => {
+    try{
+      if(!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ error: "No login with that _id" });
+      const deletedLogin = await Login.findByIdAndDelete(req.params.id);
+      const deletedUser = await User.findByIdAndDelete(deletedLogin.user);
+      res.status(200).json({deletedLogin, deletedUser});
+    }
+    catch(err){
+      res.json(err.message).status(400);
+    }
   }
 }
 

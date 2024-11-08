@@ -8,6 +8,7 @@ router.get('/', User.getUsers);
 router.get('/:id', User.getUserById);
 router.get('/id/:userId', User.getUserByUserId);
 router.get('/search', User.getUserBySearch);
+router.get('/:id/posts', User.getPostsByUser);
 
 router.post('/', hashPassword, User.createUserAndLogin);
 

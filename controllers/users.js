@@ -16,7 +16,7 @@ const userController = {
   },
   getUserById: async (req, res, next) => {
     try{
-      if(isNaN(req.params.id)) return next()
+      if(isNaN(req.params.id) && !mongoose.Types.ObjectId.isValid(req.params.id)) return next()
       const user = await User.findById(req.params.id);
       if(!user) return res.status(400).json({error: "No user with that _id"})
       res.status(200).json(user);
@@ -57,16 +57,30 @@ const userController = {
     }
     res.send("You can search Users by _id, userId, display, or email").status(400);
   },
+  getPostsByUser: async (req, res) => {
+    try{
+      const user = await User.findById(req.params.id).populate('posts');
+      if(!user) return res.status(400).json({ error: 'No user with that _id' });
+      res.status(200).json(user);
+    }
+    catch(err){
+      res.send(err.message).status(400);
+    }
+  },
   createUserAndLogin: async (req, res) => {
     try{
       const {name, email, username, password, salt, sha256} = req.body;
       // Get the length of the collection and increment by 1
-      const userCount = await User.countDocuments();
-      const loginCount = await Login.countDocuments();
+      // Get the last user's userId and the last login's loginId
+      const lastUser = await User.findOne().sort({ userId: -1 });  // Sort by userId descending
+      const lastLogin = await Login.findOne().sort({ loginId: -1 });  // Sort by loginId descending
+
+      const newUserId = lastUser ? lastUser.userId + 1 : 1;  // Increment userId or start at 1 if no user exists
+      const newLoginId = lastLogin ? lastLogin.loginId + 1 : 1;  // Increment loginId or start at 1 if no login exists
 
       // Create and save the new User
       const newUser = await User.create({
-        userId: userCount + 1,
+        userId: newUserId,
         name: {
           first: name.first,
           last: name.last,
@@ -78,7 +92,7 @@ const userController = {
 
       // Create and save the new Login, passing newUser._id to the user field
       const newLogin = await Login.create({
-        loginId: loginCount + 1,
+        loginId: newLoginId,
         username,
         password,
         salt,

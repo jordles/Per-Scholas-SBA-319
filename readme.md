@@ -49,6 +49,16 @@ db.posts.find().forEach(function(post) {
 });
 ```
 
+## Testing
+
+```
+{
+    "user": "672990b3e95aaa2d57ce4f7c",
+    "title": "What do you think about Root's UX? ",
+    "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum sollicitudin eu libero vitae varius. Fusce ut orci vulputate, suscipit libero sed."
+}
+```
+
 ## Attributions
 
 [Mockaroo](https://www.mockaroo.com/)

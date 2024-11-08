@@ -9,4 +9,6 @@ router.get('/id/:loginId', Login.getLoginByLoginId);
 
 router.patch('/:id', /* hashPassword, */ Login.updateLogin)
 
+router.delete('/:id', Login.deleteLogin)
+
 export default router

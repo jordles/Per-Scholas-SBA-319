@@ -17,6 +17,8 @@ The Mongoose Schemas utilize reference fields between collections to create rela
 
 2. in your browser navigate to URL: localhost:3000/initialize
 
+3. Be wary this route will close the connection at the end. Please rerun your server again. 
+
 ### Testing Samples for POST requests (user & post)
 
 <pre>{

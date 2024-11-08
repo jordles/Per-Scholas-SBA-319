@@ -12,9 +12,9 @@ const UserSchema = new Schema({
 }, { versionKey: false }) //disables the __v field
 
 //indexes
-UserSchema.index({userId: 1})
-UserSchema.index({display: 1})
-UserSchema.index({email: 1})
+// UserSchema.index({userId: 1})
+// UserSchema.index({display: 1})
+// UserSchema.index({email: 1})
 
 
 export default model('User', UserSchema);

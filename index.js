@@ -33,50 +33,70 @@ mongoose.connection.on('connected', () => {
 //   console.error("Mongoose connection error:", err);
 // }
 
-async function initializeDatabase(){
-  dotenv.config();
+// Utility function to convert "$oid" objects to Mongoose ObjectIds
+function extractObjectId(id) {
+  if (id && id.$oid) {
+    return new mongoose.Types.ObjectId(id.$oid); // Convert "$oid" to ObjectId
+  }
+  // If it's already a valid ObjectId or a 24-character hex string, return it
+  return mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : id;
+}
+
+async function initializeDatabase() {
   console.log("Tester please ensure you have set up the .env file with ATLAS_URI");
-  try{
+  try {
     mongoose.connect(process.env.ATLAS_URI);
     mongoose.connection.on('connected', () => {
       console.log("Connected to Mongo!");
     });
 
-    // Clear existing data and create collections with validation
+    // Clear existing data
     await User.deleteMany({});
     await Post.deleteMany({});
     await Login.deleteMany({});
 
-    // Create Indexes for the collections (through mongoose Schema)
+    // Create indexes for the collections (through mongoose Schema)
     await User.createIndexes();
     await Post.createIndexes();
     await Login.createIndexes();
 
-    // Upload user, login, and post data (this will insert the documents and create the collection if it doesn't exist)
-    const userData = JSON.parse(fs.readFileSync('./tests/rootApp.users.json', 'utf8'));
-    await User.insertMany(userData);
+    // Load and transform user data
+    const userData = JSON.parse(fs.readFileSync('./testData/rootApp.users.json', 'utf8'));
+    const usersWithObjectIds = userData.map(user => ({
+      ...user,
+      _id: extractObjectId(user._id), // Convert _id to ObjectId if needed
+      posts: user.posts ? user.posts.map(postId => extractObjectId(postId)) : [] // Convert posts references
+    }));
+    await User.insertMany(usersWithObjectIds);
 
-    
-    const loginData = JSON.parse(fs.readFileSync('./tests/rootApp.logins.json', 'utf8'));
-    await Login.insertMany(loginData);
+    // Load and transform login data
+    const loginData = JSON.parse(fs.readFileSync('./testData/rootApp.logins.json', 'utf8'));
+    const loginsWithObjectIds = loginData.map(login => ({
+      ...login,
+      _id: extractObjectId(login._id), // Convert _id to ObjectId if needed
+      user: extractObjectId(login.user) // Convert user reference
+    }));
+    await Login.insertMany(loginsWithObjectIds);
 
-    const postData = JSON.parse(fs.readFileSync('./tests/rootApp.posts.json', 'utf8'));
-    await Post.insertMany(postData);
+    // Load and transform post data
+    const postData = JSON.parse(fs.readFileSync('./testData/rootApp.posts.json', 'utf8'));
+    const postsWithObjectIds = postData.map(post => ({
+      ...post,
+      _id: extractObjectId(post._id), // Convert _id to ObjectId if needed
+      user: extractObjectId(post.user)  // Convert user ID to ObjectId
+    }));
+    await Post.insertMany(postsWithObjectIds);
 
     console.log('Database initialized successfully!');
-  }
-  catch(err){
+  } catch (err) {
     console.error("Error initializing database", err);
-  }
-  finally {
+  } finally {
     mongoose.connection.close();
   }
-
 }
 
 app.get("/initialize", async (req, res) => {
   await initializeDatabase();
-  res.send("Database initialized successfully!");
 })
 
 app.get("/", (req, res) => {
